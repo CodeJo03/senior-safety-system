@@ -418,12 +418,15 @@ int main() {
             fire_count++;
         }
         //2초 동안 불 감지 
-        if(fire_count >= 4){
+         if(fire_count >= 4){
             printf("불 나는 중 %d, %d\n",fire_count, in_fire);
 
             //적외선 감지 -> 자리 비움
             if(value == 0){
                 printf("find_people\n");
+            }
+            else{
+              fire_count -= 1;
             }
             if(in_fire == 1 && value == 0){
                 in_fire = 0;
@@ -433,8 +436,8 @@ int main() {
                 fire_count = 0;
             }
         }
-        //5초 이상 사용 그리고 자리 비움 -> 1초동안 진동 모터 
-        if(fire_count >= 20 && in_fire == 0){
+        //자리를 비우고 1분 이상 돌아오지 않음 -> 1초동안 진동 모터 
+        if(fire_count >= 124 && in_fire == 0){
             printf("Turning motor ON\n");
             GPIOWrite(MOTOR_GPIO_PIN, 1);
             sleep(1);
@@ -442,14 +445,15 @@ int main() {
             printf("Turning motor OFF\n");
             GPIOWrite(MOTOR_GPIO_PIN, 0);
         }
-        //10초 이상 사용 그리고 자리 비움 -> 모터 90도 회전
-        if(fire_count >= 40 && in_fire == 0){
+        //알람을 울리고 30초 이상 돌아오지 않음 -> 모터 90도 회전
+        if(fire_count >= 144 && in_fire == 0){
             PWMWriteDutyCycle(PWM, 1500000);// set motor degree 90
             sleep(1);
+            in_fire = 1;//진동모터 종료
             PWMWriteDutyCycle(PWM, 1000000);// set motor degree 0
         }
-        // 모터로 벨브를 잠금에도 여전히 불을 인식하면 화재로 처리
-        if(fire_count >= 50){
+        // 모터로 벨브를 잠그고 10초 후에도 여전히 불을 인식하면 화재로 처리
+        if(fire_count >= 164){
             on_fire = 1; //집 화재발생을 유무를 참으로 설정
             const char *channel_name = "test";
             const char *message = "OnFire adress";
